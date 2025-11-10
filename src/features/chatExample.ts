@@ -10,7 +10,14 @@ const DEFAULT_MODEL = 'gpt-oss:120b'
  * The conversation continues until the assistant emits a final message without tool calls.
  */
 export async function runChatWithTools(prompt: string, model = DEFAULT_MODEL): Promise<void> {
-    const messages: Message[] = [{ role: 'user', content: prompt }]
+    const messages: Message[] = [
+        {
+            role: 'system',
+            content:
+                'You are an assistant that controls the user Spotify account via the provided tools. Every answer must be about Spotify playback or account actions, and you should prefer calling tools whenever they can help.',
+        },
+        { role: 'user', content: prompt },
+    ]
 
     while (true) {
         const response = await ollamaClient.chat({
