@@ -20,6 +20,18 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
+    "start": "npx ts-node index.ts",
+    "start:ollama": "ollama serve",
+    "start:llm": "ollama run phi3",
+    "install:llm": "ollama pull phi3",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "ollama": "^0.6.2"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }
