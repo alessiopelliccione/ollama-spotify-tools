@@ -1,10 +1,11 @@
 import type { Message } from 'ollama'
 
-import { ollamaClient } from '../clients/ollamaClient'
-import { executeToolCall, toolDefinitions } from '../tools'
+import { ollamaClient } from './clients/ollamaClient'
+import { executeToolCall, toolDefinitions } from './tools'
 
 const DEFAULT_MODEL = 'gpt-oss:120b'
 
+// TODO: add @params
 /**
  * Run an Ollama chat loop capable of executing Spotify-related tool calls.
  * The conversation continues until the assistant emits a final message without tool calls.

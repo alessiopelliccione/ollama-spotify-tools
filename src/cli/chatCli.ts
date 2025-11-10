@@ -3,7 +3,7 @@ import { stdin as input, stdout as output, stderr } from 'node:process'
 import { parseArgs } from 'node:util'
 
 import { ensureSpotifyUserTokens } from '../auth/interactiveAuth'
-import { runChatWithTools } from '../features/chatExample'
+import { runChatWithTools } from '../core/chatRunner'
 
 type CliOptions = {
     model?: string

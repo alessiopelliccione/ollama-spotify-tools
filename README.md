@@ -52,10 +52,6 @@ After `npm run build`, the package exposes the `ollama-spotify-cli` bin:
 npx ollama-spotify-cli --help
 ```
 
-## Support scripts
-- `npm run auth:url` prints the Spotify authorize URL
-- `npm run auth:token -- --code <CODE>` exchanges the auth code for tokens
-- `npm run auth:refresh` refreshes the access token via `SPOTIFY_REFRESH_TOKEN`
-
 ## Extending
 `src/index.ts` re-exports `ensureSpotifyUserTokens` and `runChatWithTools`, so any interface can import and reuse the same Spotify-enabled core without depending on the CLI.
+The shared helper automatically launches the Spotify OAuth flow whenever tokens are missing, so UIs do not need bespoke authorization logic.

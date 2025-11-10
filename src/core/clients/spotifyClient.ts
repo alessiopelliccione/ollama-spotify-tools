@@ -1,8 +1,6 @@
 import SpotifyWebApi from 'spotify-web-api-node'
-import { stdout } from 'node:process'
-
-import { env, getRequiredEnv } from '../config/env'
-import { ensureSpotifyUserTokens } from '../auth/interactiveAuth'
+import { env, getRequiredEnv } from '../../config/env'
+import { ensureSpotifyUserTokens } from '../../auth/interactiveAuth'
 
 export type SpotifyClient = SpotifyWebApi
 

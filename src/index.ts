@@ -1,2 +1,2 @@
 export { ensureSpotifyUserTokens } from './auth/interactiveAuth'
-export { runChatWithTools } from './features/chatExample'
+export { runChatWithTools } from './core/chatRunner'

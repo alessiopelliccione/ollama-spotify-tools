@@ -9,6 +9,7 @@ type SpotifyApiError = {
     message?: string
 }
 
+// TODO: see if it's possible to remove since LLM can understand non formatted errors
 function formatSpotifyError(error: unknown): string {
     if (error && typeof error === 'object') {
         const { statusCode, body, message } = error as SpotifyApiError
@@ -106,6 +107,7 @@ export const toolDefinitions: Tool[] = [
     },
 ]
 
+// TODO: maybe put in another class or file
 type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>
 
 const toolHandlers: Record<string, ToolHandler> = {
