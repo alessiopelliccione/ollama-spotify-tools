@@ -16,7 +16,6 @@ export function getSpotifyClient(): SpotifyClient {
         return cachedClient
     }
 
-    stdout.write('[spotify] Creating API client\n')
     cachedClient = new SpotifyWebApi({
         clientId: getRequiredEnv('SPOTIFY_CLIENT_ID'),
         clientSecret: getRequiredEnv('SPOTIFY_CLIENT_SECRET'),
@@ -24,12 +23,10 @@ export function getSpotifyClient(): SpotifyClient {
     })
 
     if (env.spotifyAccessToken) {
-        stdout.write('[spotify] Using access token from environment\n')
         cachedClient.setAccessToken(env.spotifyAccessToken)
     }
 
     if (env.spotifyRefreshToken) {
-        stdout.write('[spotify] Using refresh token from environment\n')
         cachedClient.setRefreshToken(env.spotifyRefreshToken)
     }
 
@@ -52,15 +49,12 @@ export async function authenticateSpotifyClient(client: SpotifyClient = getSpoti
     }
 
     if (env.spotifyRefreshToken) {
-        stdout.write('[spotify] Refreshing access token using stored refresh token\n')
         client.setRefreshToken(env.spotifyRefreshToken)
         const { body } = await client.refreshAccessToken()
         client.setAccessToken(body.access_token)
-        stdout.write('[spotify] Received refreshed access token (update your env to persist it)\n')
         return client
     }
 
-    stdout.write('[spotify] Requesting client credentials token\n')
     const { body } = await client.clientCredentialsGrant()
     client.setAccessToken(body.access_token)
 

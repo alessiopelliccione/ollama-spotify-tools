@@ -45,8 +45,8 @@ Options:
   -h, --help           Show this help message
 
 Examples:
-  spotify-tools "Metti in pausa il mio Spotify"
-  spotify-tools --model llama3.1 "Che playlist dovrei ascoltare?"
+  spotify-tools "Pause my Spotify music"
+  spotify-tools --model llama3.1 "Recommend me a spotify playlist"
 
 If no prompt is provided, an interactive REPL session will start. Use /exit to quit.`.trim()
     output.write(`${helpMessage}\n`)

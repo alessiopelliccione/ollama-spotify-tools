@@ -37,7 +37,6 @@ function parseArgs(): CliArgs {
 
 async function main() {
     const { code, redirectUri } = parseArgs()
-    stdout.write('[spotify] Exchanging authorization code for tokens...\n')
     const tokens = await exchangeAuthorizationCode(code, redirectUri)
     persistSpotifyTokens(tokens)
 
