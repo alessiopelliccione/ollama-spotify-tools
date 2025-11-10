@@ -4,7 +4,7 @@ A lightweight TypeScript toolkit that connects local agents (e.g., Ollama) to th
 
 ## Requirements
 - Node.js 18+
-- A reachable Ollama instance (default `http://127.0.0.1:11434`)
+- Access to Ollama (local or via Ollama Cloud; supply `OLLAMA_HOST`/`OLLAMA_API_KEY` only when using the cloud endpoint)
 - A Spotify application with `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, and redirect URI `http://localhost:3000/callback`
 
 ## Setup
@@ -14,7 +14,9 @@ A lightweight TypeScript toolkit that connects local agents (e.g., Ollama) to th
    SPOTIFY_CLIENT_ID=...
    SPOTIFY_CLIENT_SECRET=...
    SPOTIFY_REDIRECT_URI=http://localhost:3000/callback
-   OLLAMA_HOST=http://127.0.0.1:11434
+   # Uncomment the two lines below only when using Ollama Cloud
+   # OLLAMA_HOST=https://api.ollama.cloud/v1
+   # OLLAMA_API_KEY=...
    EOF
    ```
 2. Install dependencies and build:
