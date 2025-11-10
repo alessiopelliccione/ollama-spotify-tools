@@ -1,0 +1,25 @@
+{
+  "name": "ollama-spotify-tools",
+  "version": "0.0.1",
+  "description": "A lightweight TypeScript toolkit that connects Ollama to the Spotify Web API, enabling local AI agents to interact with your Spotify account. It provides ready-to-use tool definitions (function-calling or MCP-compatible) for searching tracks, creating playlists, and controlling playback",
+  "keywords": [
+    "ollama",
+    "spotify",
+    "tools"
+  ],
+  "homepage": "https://github.com/alessiopelliccione/ollama-spotify-tools#readme",
+  "bugs": {
+    "url": "https://github.com/alessiopelliccione/ollama-spotify-tools/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alessiopelliccione/ollama-spotify-tools.git"
+  },
+  "license": "MIT",
+  "author": "Alessio Pelliccione",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
