@@ -20,12 +20,23 @@ export async function runChatWithTools(prompt: string, model = DEFAULT_MODEL): P
 
         if (assistantMessage.tool_calls?.length) {
             for (const call of assistantMessage.tool_calls) {
-                const result = await executeToolCall(call)
-                messages.push({
-                    role: 'tool',
-                    tool_name: call.function.name,
-                    content: JSON.stringify(result),
-                })
+                try {
+                    const result = await executeToolCall(call)
+                    messages.push({
+                        role: 'tool',
+                        tool_name: call.function.name,
+                        content: JSON.stringify(result),
+                    })
+                } catch (error) {
+                    console.error(`[tool] ${call.function.name} failed`, error)
+                    messages.push({
+                        role: 'tool',
+                        tool_name: call.function.name,
+                        content: JSON.stringify({
+                            error: error instanceof Error ? error.message : String(error),
+                        }),
+                    })
+                }
             }
             continue
         }

@@ -1,7 +1,10 @@
+import { ensureSpotifyUserTokens } from './auth/interactiveAuth'
 import { runChatWithTools } from './features/chatExample'
 
 async function main() {
-    await runChatWithTools("Com'e il tempo oggi a Barcellona?")
+    await ensureSpotifyUserTokens()
+    console.log('[app] Spotify authentication ready, starting chat...')
+    await runChatWithTools('Metti in pausa il mio spotify')
 }
 
 main().catch((error) => {

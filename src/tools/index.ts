@@ -1,25 +1,62 @@
 import type { Tool, ToolCall } from 'ollama'
 
+import { authenticateSpotifyClient } from '../clients/spotifyClient'
+
+const SPOTIFY_API_BASE = 'https://api.spotify.com'
+
+type SpotifyApiError = {
+    statusCode?: number
+    body?: unknown
+    message?: string
+}
+
+function logCurlReplay(method: string, path: string, accessToken: string | null | undefined, body?: Record<string, unknown>) {
+    const payload = body && Object.keys(body).length > 0 ? ` -H 'Content-Type: application/json' -d '${JSON.stringify(body)}'` : ''
+    const token = accessToken ?? '<token>'
+    console.log(`[curl] curl -X ${method.toUpperCase()} "${SPOTIFY_API_BASE}${path}" -H 'Authorization: Bearer ${token}'${payload}`)
+}
+
+function formatSpotifyError(error: unknown): string {
+    if (error && typeof error === 'object') {
+        const { statusCode, body, message } = error as SpotifyApiError
+        const details = typeof body === 'object' && body !== null ? JSON.stringify(body) : body
+        return [statusCode && `status=${statusCode}`, message, details]
+            .filter(Boolean)
+            .join(' | ')
+    }
+    if (error instanceof Error) {
+        return error.message
+    }
+    return String(error)
+}
+
 export const toolDefinitions: Tool[] = [
     {
         type: 'function',
         function: {
-            name: 'get_current_weather',
-            description: 'Get the current weather for a city',
+            name: 'get_spotify_me',
+            description: 'Fetch profile information about the currently authenticated Spotify user',
+            parameters: {
+                type: 'object',
+                properties: {},
+                required: [],
+            },
+        },
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'pause_spotify_playback',
+            description: 'Pause the current Spotify playback for the authenticated user',
             parameters: {
                 type: 'object',
                 properties: {
-                    city: {
+                    deviceId: {
                         type: 'string',
-                        description: 'The name of the city to look up',
-                    },
-                    units: {
-                        type: 'string',
-                        enum: ['metric', 'imperial'],
-                        description: 'Preferred temperature units',
+                        description: 'Optional device ID. If omitted, Spotify pauses the active device.',
                     },
                 },
-                required: ['city'],
+                required: [],
             },
         },
     },
@@ -28,27 +65,46 @@ export const toolDefinitions: Tool[] = [
 type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>
 
 const toolHandlers: Record<string, ToolHandler> = {
-    get_current_weather: async (args) => {
-        const city = typeof args.city === 'string' ? args.city : ''
-        if (!city) {
-            throw new Error('city argument is required')
+    get_spotify_me: async (_args) => {
+        const spotify = await authenticateSpotifyClient()
+        const path = '/v1/me'
+        logCurlReplay('GET', path, spotify.getAccessToken())
+        try {
+            const response = await spotify.getMe()
+            return {
+                user: response.body,
+                fetchedAt: new Date().toISOString(),
+            }
+        } catch (error) {
+            const message = formatSpotifyError(error)
+            console.error('[tool] get_spotify_me failed', message)
+            return {
+                error: message,
+                fetchedAt: new Date().toISOString(),
+            }
         }
-
-        const units = args.units === 'imperial' ? 'imperial' : 'metric'
-        const baseTemp = 12 + (city.length % 10)
-        const temperatureC = units === 'metric' ? baseTemp : (baseTemp * 9) / 5 + 32
-
-        return {
-            location: city,
-            description: city.length % 2 === 0 ? 'Partly cloudy' : 'Sunny',
-            temperature: {
-                value: Number(temperatureC.toFixed(1)),
-                units: units === 'metric' ? 'celsius' : 'fahrenheit',
-            },
-            humidity: 40 + (city.length % 20),
-            windKph: 10 + (city.length % 5),
-            observedAt: new Date().toISOString(),
-            dataSource: 'demo-weather-service',
+    },
+    pause_spotify_playback: async (args) => {
+        const deviceId = typeof args.deviceId === 'string' ? args.deviceId : undefined
+        const spotify = await authenticateSpotifyClient()
+        const path = `/v1/me/player/pause${deviceId ? `?device_id=${encodeURIComponent(deviceId)}` : ''}`
+        logCurlReplay('PUT', path, spotify.getAccessToken())
+        try {
+            await spotify.pause({ device_id: deviceId })
+            return {
+                status: 'paused',
+                deviceId,
+                completedAt: new Date().toISOString(),
+            }
+        } catch (error) {
+            const message = formatSpotifyError(error)
+            console.error('[tool] pause_spotify_playback failed', message)
+            return {
+                status: 'failed',
+                deviceId,
+                error: message,
+                completedAt: new Date().toISOString(),
+            }
         }
     },
 }
