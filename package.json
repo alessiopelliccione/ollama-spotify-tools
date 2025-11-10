@@ -18,19 +18,20 @@
   "license": "MIT",
   "author": "Alessio Pelliccione",
   "type": "commonjs",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "npx ts-node index.ts",
-    "start:ollama": "ollama serve",
-    "start:llm": "ollama run phi3",
-    "install:llm": "ollama pull phi3",
+    "build": "tsc -p tsconfig.json",
+    "start": "npx ts-node src/index.ts",
+    "start:spotify": "npx ts-node src/spotify.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "dotenv": "^17.2.3",
-    "ollama": "^0.6.2"
+    "ollama": "^0.6.2",
+    "spotify-web-api-node": "^5.0.2"
   },
   "devDependencies": {
+    "@types/spotify-web-api-node": "^5.0.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
