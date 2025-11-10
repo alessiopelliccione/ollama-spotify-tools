@@ -1,14 +1,14 @@
 # Ollama Spotify Tools
 
-Un toolkit TypeScript che collega agenti locali (es. Ollama) all'API Web di Spotify tramite strumenti già pronti. L'obiettivo è tenere il core riutilizzabile e agganciare diverse interfacce (CLI, app, web) che condividono la stessa logica.
+A lightweight TypeScript toolkit that connects local agents (e.g., Ollama) to the Spotify Web API through ready-to-use tool definitions. The core is framework-agnostic so different interfaces (CLI, desktop app, web UI, custom agents) can share the same logic.
 
-## Requisiti
+## Requirements
 - Node.js 18+
-- Un'istanza Ollama raggiungibile (default `http://127.0.0.1:11434`)
-- Una Spotify App con `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` e un redirect `http://localhost:3000/callback`
+- A reachable Ollama instance (default `http://127.0.0.1:11434`)
+- A Spotify application with `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, and redirect URI `http://localhost:3000/callback`
 
-## Configurazione
-1. Copia le variabili richieste in `.env` o nel tuo ambiente:
+## Setup
+1. Provide the required env vars via `.env` or your shell:
    ```bash
    cat <<'EOF' > .env
    SPOTIFY_CLIENT_ID=...
@@ -17,43 +17,43 @@ Un toolkit TypeScript che collega agenti locali (es. Ollama) all'API Web di Spot
    OLLAMA_HOST=http://127.0.0.1:11434
    EOF
    ```
-2. Installa le dipendenze e compila:
+2. Install dependencies and build:
    ```bash
    npm install
    npm run build
    ```
 
 ## CLI
-La CLI (`ollama-spotify-cli`) avvia l'autenticazione Spotify **solo** alla prima esecuzione della sessione, poi riutilizza i token per tutte le richieste successive.
+The CLI (`ollama-spotify-cli`) kicks off Spotify OAuth only once per session and reuses the tokens afterward.
 
-### Esecuzione rapida (prompt singolo)
+### Single-prompt run
 ```bash
-npm run cli -- "Metti in pausa il mio Spotify"
+npm run cli -- "Pause my Spotify playback"
 ```
-Puoi cambiare modello con `-m`:
+Override the model with `-m`:
 ```bash
-npm run cli -- --model llama3.1 "Che playlist mi consigli?"
+npm run cli -- --model llama3.1 "Suggest a playlist"
 ```
 
-### Modalità interattiva
-Avvia la CLI senza prompt per entrare in un REPL:
+### Interactive mode
+Start the CLI without a prompt to enter a REPL:
 ```bash
 npm run cli
 ```
-Comandi disponibili:
-- `/help` mostra i comandi
-- `/exit` chiude la sessione
+Commands:
+- `/help` prints available commands
+- `/exit` terminates the REPL
 
-### Binario pubblicato
-Dopo `npm run build`, il pacchetto espone il bin `ollama-spotify-cli`:
+### Installed binary
+After `npm run build`, the package exposes the `ollama-spotify-cli` bin:
 ```bash
 npx ollama-spotify-cli --help
 ```
 
-## Script di supporto
-- `npm run auth:url` stampa l'URL di autorizzazione
-- `npm run auth:token -- --code <CODE>` scambia il codice per i token
-- `npm run auth:refresh` rinnova il token di accesso usando `SPOTIFY_REFRESH_TOKEN`
+## Support scripts
+- `npm run auth:url` prints the Spotify authorize URL
+- `npm run auth:token -- --code <CODE>` exchanges the auth code for tokens
+- `npm run auth:refresh` refreshes the access token via `SPOTIFY_REFRESH_TOKEN`
 
-## Estensioni
-Le funzioni esportate in `src/index.ts` (`ensureSpotifyUserTokens`, `runChatWithTools`) permettono di costruire UI alternative condividendo gli stessi strumenti Spotify.
+## Extending
+`src/index.ts` re-exports `ensureSpotifyUserTokens` and `runChatWithTools`, so any interface can import and reuse the same Spotify-enabled core without depending on the CLI.
