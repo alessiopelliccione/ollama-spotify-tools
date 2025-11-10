@@ -1,0 +1,106 @@
+import readline from 'node:readline/promises'
+import { stdin as input, stdout as output } from 'node:process'
+import { parseArgs } from 'node:util'
+
+import { ensureSpotifyUserTokens } from '../auth/interactiveAuth'
+import { runChatWithTools } from '../features/chatExample'
+
+type CliOptions = {
+    model?: string
+}
+
+type ParsedCliArgs = CliOptions & {
+    helpRequested: boolean
+    prompt?: string
+}
+
+function parseCliArguments(): ParsedCliArgs {
+    const { values, positionals } = parseArgs({
+        options: {
+            model: { type: 'string', short: 'm' },
+            help: { type: 'boolean', short: 'h' },
+        },
+        allowPositionals: true,
+    })
+
+    return {
+        model: values.model,
+        helpRequested: Boolean(values.help),
+        prompt: positionals.length ? positionals.join(' ').trim() : undefined,
+    }
+}
+
+function printHelp() {
+    const helpMessage = `
+Usage: spotify-tools [options] [prompt]
+
+Options:
+  -m, --model <name>   Override the default Ollama model (default: gpt-oss:120b)
+  -h, --help           Show this help message
+
+Examples:
+  spotify-tools "Metti in pausa il mio Spotify"
+  spotify-tools --model llama3.1 "Che playlist dovrei ascoltare?"
+
+If no prompt is provided, an interactive REPL session will start. Use /exit to quit.`.trim()
+    // eslint-disable-next-line no-console
+    console.log(helpMessage)
+}
+
+async function runInteractiveLoop(options: CliOptions) {
+    const rl = readline.createInterface({ input, output })
+    output.write('Type a message to send it to runChatWithTools. Use /help for commands.\n')
+
+    rl.on('SIGINT', () => {
+        output.write('\nUse /exit to quit.\n')
+    })
+
+    while (true) {
+        const message = (await rl.question('spotify-tools> ')).trim()
+
+        if (!message) {
+            continue
+        }
+
+        const normalized = message.toLowerCase()
+        if (normalized === '/exit' || normalized === '/quit') {
+            break
+        }
+        if (normalized === '/help') {
+            output.write('Commands: /exit (quit), /help (show this message)\n')
+            continue
+        }
+
+        try {
+            await runChatWithTools(message, options.model)
+        } catch (error) {
+            output.write(`[cli] runChatWithTools failed: ${error instanceof Error ? error.message : String(error)}\n`)
+        }
+    }
+
+    rl.close()
+}
+
+async function main() {
+    const parsed = parseCliArguments()
+    if (parsed.helpRequested) {
+        printHelp()
+        return
+    }
+
+    output.write('[cli] Preparing Spotify authentication...\n')
+    await ensureSpotifyUserTokens()
+    output.write('[cli] Ready! Spotify access tokens available.\n')
+
+    if (parsed.prompt) {
+        await runChatWithTools(parsed.prompt, parsed.model)
+        return
+    }
+
+    await runInteractiveLoop(parsed)
+}
+
+main().catch((error) => {
+    console.error('[cli] Unexpected error:', error)
+    process.exitCode = 1
+})
