@@ -1,14 +1,16 @@
+import { stdout, stderr } from 'node:process'
+
 import { createSpotifyAuthorizeUrl } from '../auth/spotifyAuthorization'
 
 async function main() {
     const { url, scopes, state } = createSpotifyAuthorizeUrl()
-    console.log('Spotify authorization URL:')
-    console.log(url)
-    console.log('\nScopes:', scopes.join(', '))
-    console.log('State:', state)
+    stdout.write('Spotify authorization URL:\n')
+    stdout.write(`${url}\n`)
+    stdout.write(`\nScopes: ${scopes.join(', ')}\n`)
+    stdout.write(`State: ${state}\n`)
 }
 
 main().catch((error) => {
-    console.error('Failed to generate Spotify authorization URL:', error)
+    stderr.write(`Failed to generate Spotify authorization URL: ${error instanceof Error ? error.message : String(error)}\n`)
     process.exit(1)
 })

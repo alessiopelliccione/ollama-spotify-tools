@@ -10,6 +10,9 @@ export const DEFAULT_SPOTIFY_SCOPES = [
     'user-modify-playback-state',
 ]
 
+/**
+ * Build the Spotify OAuth authorize URL with sane defaults for scopes and state.
+ */
 export function createSpotifyAuthorizeUrl(options?: {
     scopes?: string[]
     state?: string

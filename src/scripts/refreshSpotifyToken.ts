@@ -1,3 +1,5 @@
+import { stdout, stderr } from 'node:process'
+
 import { env } from '../config/env'
 import { persistSpotifyTokens, refreshAccessTokenWith } from '../auth/tokenManager'
 
@@ -7,19 +9,19 @@ async function main() {
         throw new Error('SPOTIFY_REFRESH_TOKEN is not set. Run npm run auth:token first.')
     }
 
-    console.log('[spotify] Refreshing access token...')
+    stdout.write('[spotify] Refreshing access token...\n')
     const tokens = await refreshAccessTokenWith(refreshToken)
     persistSpotifyTokens(tokens)
 
-    console.log('access_token:', tokens.accessToken)
+    stdout.write(`access_token: ${tokens.accessToken}\n`)
     if (tokens.refreshToken) {
-        console.log('refresh_token:', tokens.refreshToken)
+        stdout.write(`refresh_token: ${tokens.refreshToken}\n`)
     }
-    console.log('expires_in:', tokens.expiresIn, 'seconds')
-    console.log('\nTokens saved to .env.local and environment variables.')
+    stdout.write(`expires_in: ${tokens.expiresIn} seconds\n`)
+    stdout.write('\nTokens saved to .env.local and environment variables.\n')
 }
 
 main().catch((error) => {
-    console.error('Failed to refresh access token:', error)
+    stderr.write(`Failed to refresh access token: ${error instanceof Error ? error.message : String(error)}\n`)
     process.exit(1)
 })

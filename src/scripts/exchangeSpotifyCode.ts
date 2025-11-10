@@ -1,3 +1,5 @@
+import { stdout, stderr } from 'node:process'
+
 import { env } from '../config/env'
 import { exchangeAuthorizationCode, persistSpotifyTokens } from '../auth/tokenManager'
 
@@ -35,19 +37,19 @@ function parseArgs(): CliArgs {
 
 async function main() {
     const { code, redirectUri } = parseArgs()
-    console.log('[spotify] Exchanging authorization code for tokens...')
+    stdout.write('[spotify] Exchanging authorization code for tokens...\n')
     const tokens = await exchangeAuthorizationCode(code, redirectUri)
     persistSpotifyTokens(tokens)
 
-    console.log('access_token:', tokens.accessToken)
+    stdout.write(`access_token: ${tokens.accessToken}\n`)
     if (tokens.refreshToken) {
-        console.log('refresh_token:', tokens.refreshToken)
+        stdout.write(`refresh_token: ${tokens.refreshToken}\n`)
     }
-    console.log('expires_in:', tokens.expiresIn, 'seconds')
-    console.log('\nTokens saved to .env.local and environment variables.')
+    stdout.write(`expires_in: ${tokens.expiresIn} seconds\n`)
+    stdout.write('\nTokens saved to .env.local and environment variables.\n')
 }
 
 main().catch((error) => {
-    console.error('Failed to exchange code for tokens:', error)
+    stderr.write(`Failed to exchange code for tokens: ${error instanceof Error ? error.message : String(error)}\n`)
     process.exit(1)
 })

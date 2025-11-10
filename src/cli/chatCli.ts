@@ -1,5 +1,5 @@
 import readline from 'node:readline/promises'
-import { stdin as input, stdout as output } from 'node:process'
+import { stdin as input, stdout as output, stderr } from 'node:process'
 import { parseArgs } from 'node:util'
 
 import { ensureSpotifyUserTokens } from '../auth/interactiveAuth'
@@ -14,6 +14,9 @@ type ParsedCliArgs = CliOptions & {
     prompt?: string
 }
 
+/**
+ * Parse positional arguments and flags supported by the CLI.
+ */
 function parseCliArguments(): ParsedCliArgs {
     const { values, positionals } = parseArgs({
         options: {
@@ -30,6 +33,9 @@ function parseCliArguments(): ParsedCliArgs {
     }
 }
 
+/**
+ * Print detailed usage instructions for the CLI.
+ */
 function printHelp() {
     const helpMessage = `
 Usage: spotify-tools [options] [prompt]
@@ -43,10 +49,12 @@ Examples:
   spotify-tools --model llama3.1 "Che playlist dovrei ascoltare?"
 
 If no prompt is provided, an interactive REPL session will start. Use /exit to quit.`.trim()
-    // eslint-disable-next-line no-console
-    console.log(helpMessage)
+    output.write(`${helpMessage}\n`)
 }
 
+/**
+ * Start a REPL loop that forwards every user message to runChatWithTools.
+ */
 async function runInteractiveLoop(options: CliOptions) {
     const rl = readline.createInterface({ input, output })
     output.write('Type a message to send it to runChatWithTools. Use /help for commands.\n')
@@ -81,6 +89,9 @@ async function runInteractiveLoop(options: CliOptions) {
     rl.close()
 }
 
+/**
+ * Entry point executed when the CLI runs from the command line.
+ */
 async function main() {
     const parsed = parseCliArguments()
     if (parsed.helpRequested) {
@@ -101,6 +112,6 @@ async function main() {
 }
 
 main().catch((error) => {
-    console.error('[cli] Unexpected error:', error)
+    stderr.write(`[cli] Unexpected error: ${error instanceof Error ? error.message : String(error)}\n`)
     process.exitCode = 1
 })

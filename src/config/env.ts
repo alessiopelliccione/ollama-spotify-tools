@@ -9,6 +9,9 @@ function formatMissingEnvMessage(name: string) {
     return `Missing required environment variable ${name}. Add it to your shell or .env file.`
 }
 
+/**
+ * Retrieve a required environment variable or throw a descriptive error.
+ */
 export function getRequiredEnv(name: string): string {
     const value = process.env[name]
     if (!value) {

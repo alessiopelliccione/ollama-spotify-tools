@@ -2,11 +2,16 @@ import crypto from 'node:crypto'
 import http from 'node:http'
 import { spawn } from 'node:child_process'
 import { URL } from 'node:url'
+import { stdout, stderr } from 'node:process'
 
 import { env } from '../config/env'
 import { createSpotifyAuthorizeUrl } from './spotifyAuthorization'
 import { exchangeAuthorizationCode, persistSpotifyTokens } from './tokenManager'
 
+/**
+ * Ensure Spotify user tokens exist, starting an OAuth flow if the current process lacks them.
+ * The authorization server only boots when both access and refresh tokens are missing.
+ */
 export async function ensureSpotifyUserTokens(): Promise<void> {
     if (env.spotifyAccessToken || env.spotifyRefreshToken) {
         return
@@ -21,7 +26,7 @@ export async function ensureSpotifyUserTokens(): Promise<void> {
     const state = crypto.randomBytes(16).toString('hex')
     const { url } = createSpotifyAuthorizeUrl({ state, showDialog: true })
 
-    console.log('[spotify] Starting temporary callback server on', redirect.toString())
+    stdout.write(`[spotify] Starting temporary callback server on ${redirect.toString()}\n`)
     const port = Number(redirect.port) || (redirect.protocol === 'https:' ? 443 : 80)
 
     await new Promise<void>((resolve, reject) => {
@@ -56,13 +61,16 @@ export async function ensureSpotifyUserTokens(): Promise<void> {
         })
 
         server.listen(port, redirect.hostname, () => {
-            console.log('[spotify] Please complete the authorization in your browser.')
+            stdout.write('[spotify] Please complete the authorization in your browser.\n')
             openInBrowser(url)
-            console.log('[spotify] If the browser did not open automatically, visit:', url)
+            stdout.write(`[spotify] If the browser did not open automatically, visit: ${url}\n`)
         })
     })
 }
 
+/**
+ * Validate the callback HTTP request and persist tokens if the flow completes successfully.
+ */
 async function handleCallbackRequest({
     req,
     res,
@@ -100,15 +108,19 @@ async function handleCallbackRequest({
         persistSpotifyTokens(tokens)
         res.writeHead(200, { 'Content-Type': 'text/html' })
         res.end('<html><body><h1>Spotify authorization complete</h1><p>You can return to the terminal.</p></body></html>')
-        console.log('[spotify] Authorization successful. Tokens saved to .env.local')
+        stdout.write('[spotify] Authorization successful. Tokens saved to .env.local\n')
     } catch (error) {
-        console.error('[spotify] Failed to exchange code for tokens', error)
+        const message = error instanceof Error ? error.stack ?? error.message : String(error)
+        stderr.write(`[spotify] Failed to exchange code for tokens: ${message}\n`)
         res.writeHead(500).end('Failed to exchange code. Check terminal output for details.')
     }
 
     return true
 }
 
+/**
+ * Attempt to open the Spotify authorization URL in the user's default browser.
+ */
 function openInBrowser(targetUrl: string) {
     const platform = process.platform
     let command: string
@@ -127,7 +139,7 @@ function openInBrowser(targetUrl: string) {
 
     const child = spawn(command, args, { stdio: 'ignore', detached: true })
     child.on('error', () => {
-        console.log('Unable to open browser automatically. Please visit:', targetUrl)
+        stdout.write(`Unable to open browser automatically. Please visit: ${targetUrl}\n`)
     })
     child.unref()
 }

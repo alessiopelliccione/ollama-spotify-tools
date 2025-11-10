@@ -1,4 +1,5 @@
 import type { Tool, ToolCall } from 'ollama'
+import { stdout, stderr } from 'node:process'
 
 import { authenticateSpotifyClient } from '../clients/spotifyClient'
 
@@ -13,7 +14,7 @@ type SpotifyApiError = {
 function logCurlReplay(method: string, path: string, accessToken: string | null | undefined, body?: Record<string, unknown>) {
     const payload = body && Object.keys(body).length > 0 ? ` -H 'Content-Type: application/json' -d '${JSON.stringify(body)}'` : ''
     const token = accessToken ?? '<token>'
-    console.log(`[curl] curl -X ${method.toUpperCase()} "${SPOTIFY_API_BASE}${path}" -H 'Authorization: Bearer ${token}'${payload}`)
+    stdout.write(`[curl] curl -X ${method.toUpperCase()} "${SPOTIFY_API_BASE}${path}" -H 'Authorization: Bearer ${token}'${payload}\n`)
 }
 
 function formatSpotifyError(error: unknown): string {
@@ -75,9 +76,9 @@ const toolHandlers: Record<string, ToolHandler> = {
                 user: response.body,
                 fetchedAt: new Date().toISOString(),
             }
-        } catch (error) {
-            const message = formatSpotifyError(error)
-            console.error('[tool] get_spotify_me failed', message)
+            } catch (error) {
+                const message = formatSpotifyError(error)
+                stderr.write(`[tool] get_spotify_me failed: ${message}\n`)
             return {
                 error: message,
                 fetchedAt: new Date().toISOString(),
@@ -98,7 +99,7 @@ const toolHandlers: Record<string, ToolHandler> = {
             }
         } catch (error) {
             const message = formatSpotifyError(error)
-            console.error('[tool] pause_spotify_playback failed', message)
+            stderr.write(`[tool] pause_spotify_playback failed: ${message}\n`)
             return {
                 status: 'failed',
                 deviceId,
@@ -109,6 +110,9 @@ const toolHandlers: Record<string, ToolHandler> = {
     },
 }
 
+/**
+ * Execute an Ollama tool call by routing it to the corresponding Spotify handler.
+ */
 export async function executeToolCall(call: ToolCall): Promise<unknown> {
     const name = call.function.name
     const handler = toolHandlers[name]

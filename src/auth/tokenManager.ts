@@ -13,6 +13,9 @@ export type SpotifyTokenSet = {
 
 const LOCAL_ENV_PATH = path.resolve(process.cwd(), '.env.local')
 
+/**
+ * Exchange a Spotify authorization code for user tokens.
+ */
 export async function exchangeAuthorizationCode(code: string, redirectUri = env.spotifyRedirectUri): Promise<SpotifyTokenSet> {
     const spotify = new SpotifyWebApi({
         clientId: getRequiredEnv('SPOTIFY_CLIENT_ID'),
@@ -29,6 +32,9 @@ export async function exchangeAuthorizationCode(code: string, redirectUri = env.
     }
 }
 
+/**
+ * Refresh an access token using the provided refresh token.
+ */
 export async function refreshAccessTokenWith(refreshToken: string): Promise<SpotifyTokenSet> {
     const spotify = new SpotifyWebApi({
         clientId: getRequiredEnv('SPOTIFY_CLIENT_ID'),
@@ -46,6 +52,9 @@ export async function refreshAccessTokenWith(refreshToken: string): Promise<Spot
     }
 }
 
+/**
+ * Persist Spotify tokens in memory, process env, and .env.local.
+ */
 export function persistSpotifyTokens(tokens: SpotifyTokenSet) {
     env.spotifyAccessToken = tokens.accessToken
     process.env.SPOTIFY_ACCESS_TOKEN = tokens.accessToken
