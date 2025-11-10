@@ -1,20 +1,38 @@
+import type { Message } from 'ollama'
+
 import { ollamaClient } from '../clients/ollamaClient'
+import { executeToolCall, toolDefinitions } from '../tools'
 
 const DEFAULT_MODEL = 'gpt-oss:120b'
 
-export async function streamChat(prompt: string, model = DEFAULT_MODEL): Promise<void> {
-    const response = await ollamaClient.chat({
-        model,
-        messages: [{ role: 'user', content: prompt }],
-        stream: true,
-    })
+export async function runChatWithTools(prompt: string, model = DEFAULT_MODEL): Promise<void> {
+    const messages: Message[] = [{ role: 'user', content: prompt }]
 
-    for await (const part of response) {
-        const chunk = part.message?.content
-        if (chunk) {
-            process.stdout.write(chunk)
+    while (true) {
+        const response = await ollamaClient.chat({
+            model,
+            messages,
+            tools: toolDefinitions,
+        })
+
+        const assistantMessage = response.message
+        messages.push(assistantMessage)
+
+        if (assistantMessage.tool_calls?.length) {
+            for (const call of assistantMessage.tool_calls) {
+                const result = await executeToolCall(call)
+                messages.push({
+                    role: 'tool',
+                    tool_name: call.function.name,
+                    content: JSON.stringify(result),
+                })
+            }
+            continue
         }
-    }
 
-    process.stdout.write('\n')
+        if (assistantMessage.content) {
+            process.stdout.write(`${assistantMessage.content}\n`)
+        }
+        break
+    }
 }

@@ -1,7 +1,7 @@
-import { streamChat } from './features/chatExample'
+import { runChatWithTools } from './features/chatExample'
 
 async function main() {
-    await streamChat('Explain quantum computing')
+    await runChatWithTools("Com'e il tempo oggi a Barcellona?")
 }
 
 main().catch((error) => {
