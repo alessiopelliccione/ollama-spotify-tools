@@ -64,7 +64,7 @@ async function runInteractiveLoop(options: CliOptions) {
     })
 
     while (true) {
-        const message = (await rl.question('spotify-tools> ')).trim()
+        const message = (await rl.question('Spotify Tools CLI> ')).trim()
 
         if (!message) {
             continue
