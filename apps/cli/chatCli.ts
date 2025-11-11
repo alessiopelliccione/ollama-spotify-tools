@@ -3,7 +3,7 @@ import { stdin as input, stdout as output, stderr } from 'node:process'
 import { parseArgs } from 'node:util'
 
 import { ensureSpotifyUserTokens } from '../../core/auth/interactiveAuth'
-import { runChatWithTools } from '../../core/core/chatRunner'
+import { runChatWithTools } from '../../core/chatRunner'
 
 /**
  * CLI flags that influence how requests are issued to Ollama.

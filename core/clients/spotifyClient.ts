@@ -1,6 +1,6 @@
 import SpotifyWebApi from 'spotify-web-api-node'
-import { env, getRequiredEnv } from '../../config/env'
-import { ensureSpotifyUserTokens } from '../../auth/interactiveAuth'
+import { env, getRequiredEnv } from '../config/env'
+import { ensureSpotifyUserTokens } from '../auth/interactiveAuth'
 
 /**
  * Convenient alias around the Spotify Web API SDK so downstream code can remain agnostic

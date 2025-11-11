@@ -1,6 +1,6 @@
 import { Ollama } from 'ollama'
 
-import { env } from '../../config/env'
+import { env } from '../config/env'
 
 const headers = env.ollamaApiKey
     ? { Authorization: `Bearer ${env.ollamaApiKey}` }
