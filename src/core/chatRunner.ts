@@ -3,12 +3,17 @@ import type { Message } from 'ollama'
 import { ollamaClient } from './clients/ollamaClient'
 import { executeToolCall, toolDefinitions } from './tools'
 
+/**
+ * Default Ollama model leveraged by the CLI when the caller does not specify one.
+ */
 const DEFAULT_MODEL = 'gpt-oss:120b'
 
-// TODO: add @params to documentation
 /**
- * Run an Ollama chat loop capable of executing Spotify-related tool calls.
- * The conversation continues until the assistant emits a final message without tool calls.
+ * Run an Ollama chat loop capable of executing Spotify-related tool calls. The conversation
+ * continues until the assistant emits a final message without tool calls.
+ *
+ * @param prompt User prompt that seeds the conversation.
+ * @param model Optional Ollama model identifier.
  */
 export async function runChatWithTools(prompt: string, model = DEFAULT_MODEL): Promise<void> {
     const messages: Message[] = [

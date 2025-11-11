@@ -5,6 +5,9 @@ import SpotifyWebApi from 'spotify-web-api-node'
 
 import { env, getRequiredEnv } from '../config/env'
 
+/**
+ * Normalized representation of the token payloads returned by Spotify's OAuth endpoints.
+ */
 export type SpotifyTokenSet = {
     accessToken: string
     refreshToken?: string
@@ -14,7 +17,10 @@ export type SpotifyTokenSet = {
 const LOCAL_ENV_PATH = path.resolve(process.cwd(), '.env.local')
 
 /**
- * Exchange a Spotify authorization code for user tokens.
+ * Exchange a Spotify authorization code for a first-party user token set.
+ *
+ * @param code Authorization code captured from the redirect.
+ * @param redirectUri The redirect URI used during the authorization request.
  */
 export async function exchangeAuthorizationCode(code: string, redirectUri = env.spotifyRedirectUri): Promise<SpotifyTokenSet> {
     const spotify = new SpotifyWebApi({
@@ -34,6 +40,8 @@ export async function exchangeAuthorizationCode(code: string, redirectUri = env.
 
 /**
  * Refresh an access token using the provided refresh token.
+ *
+ * @param refreshToken Valid Spotify refresh token issued to the user.
  */
 export async function refreshAccessTokenWith(refreshToken: string): Promise<SpotifyTokenSet> {
     const spotify = new SpotifyWebApi({
@@ -53,7 +61,8 @@ export async function refreshAccessTokenWith(refreshToken: string): Promise<Spot
 }
 
 /**
- * Persist Spotify tokens in memory, process env, and .env.local.
+ * Persist Spotify tokens in memory, process env, and .env.local so future runs can reuse the
+ * credentials without reauthorizing.
  */
 export function persistSpotifyTokens(tokens: SpotifyTokenSet) {
     env.spotifyAccessToken = tokens.accessToken
@@ -70,6 +79,9 @@ export function persistSpotifyTokens(tokens: SpotifyTokenSet) {
     })
 }
 
+/**
+ * Update `.env.local` with the latest token values while preserving unrelated entries.
+ */
 function upsertLocalEnv(values: Record<string, string | undefined>) {
     let lines: string[] = []
     if (fs.existsSync(LOCAL_ENV_PATH)) {

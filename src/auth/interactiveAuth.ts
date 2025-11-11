@@ -2,15 +2,18 @@ import crypto from 'node:crypto'
 import http from 'node:http'
 import { spawn } from 'node:child_process'
 import { URL } from 'node:url'
-import { stdout, stderr } from 'node:process'
 
 import { env } from '../config/env'
 import { createSpotifyAuthorizeUrl } from './spotifyAuthorization'
 import { exchangeAuthorizationCode, persistSpotifyTokens } from './tokenManager'
 
 /**
- * Ensure Spotify user tokens exist, starting an OAuth flow if the current process lacks them.
- * The authorization server only boots when both access and refresh tokens are missing.
+ * Ensure Spotify user tokens exist by starting an interactive OAuth flow whenever neither an
+ * access token nor a refresh token is present. The helper spins up a temporary HTTP server on
+ * the configured redirect URI so the CLI can capture the authorization code locally.
+ *
+ * @returns Resolves once credentials are guaranteed to exist (either because they were already
+ *          present or because the interactive flow completed successfully).
  */
 export async function ensureSpotifyUserTokens(): Promise<void> {
     if (env.spotifyAccessToken || env.spotifyRefreshToken) {
@@ -66,7 +69,16 @@ export async function ensureSpotifyUserTokens(): Promise<void> {
 }
 
 /**
- * Validate the callback HTTP request and persist tokens if the flow completes successfully.
+ * Validate the OAuth redirect request, enforce state matching, exchange the authorization code
+ * for tokens and persist them. Responses are written directly to the HTTP connection so the
+ * user receives immediate feedback in their browser.
+ *
+ * @param req Node HTTP request produced by the local callback server.
+ * @param res Node HTTP response used to acknowledge the browser.
+ * @param state CSRF protection token sent during authorization.
+ * @param redirect Parsed redirect URL used to validate hosts/paths.
+ * @returns `true` when the request targets the redirect route (regardless of success) so the
+ *          caller can decide whether to keep the server alive.
  */
 async function handleCallbackRequest({
     req,
@@ -114,7 +126,10 @@ async function handleCallbackRequest({
 }
 
 /**
- * Attempt to open the Spotify authorization URL in the user's default browser.
+ * Attempt to open the Spotify authorization URL in the user's default browser. The command
+ * varies between platforms but runs detached to avoid blocking the CLI.
+ *
+ * @param targetUrl The authorization URL to launch.
  */
 function openInBrowser(targetUrl: string) {
     const platform = process.platform

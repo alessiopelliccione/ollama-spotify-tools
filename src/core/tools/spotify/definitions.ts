@@ -1,5 +1,9 @@
 import type { Tool } from 'ollama'
 
+/**
+ * Spotify tool schemas exposed to the LLM. Each definition mirrors a deterministic playback
+ * action that the CLI can service through the Web API.
+ */
 export const spotifyToolDefinitions: Tool[] = [
     {
         type: 'function',

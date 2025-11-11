@@ -4,6 +4,10 @@ import { spotifyToolDefinitions } from './spotify/definitions'
 import { spotifyToolHandlers } from './spotify/handlers'
 import type { ToolHandler, ToolModule } from './types'
 
+/**
+ * Domains that contribute tool definitions + handlers to the runtime. Extend this list to
+ * onboard additional providers.
+ */
 const toolModules: ToolModule[] = [
     {
         definitions: spotifyToolDefinitions,
@@ -11,6 +15,9 @@ const toolModules: ToolModule[] = [
     },
 ]
 
+/**
+ * Flattened view of every tool schema exposed to the LLM.
+ */
 export const toolDefinitions: Tool[] = toolModules.flatMap((toolset) => toolset.definitions)
 
 const toolHandlers: Record<string, ToolHandler> = {}

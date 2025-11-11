@@ -2,12 +2,17 @@ import SpotifyWebApi from 'spotify-web-api-node'
 import { env, getRequiredEnv } from '../../config/env'
 import { ensureSpotifyUserTokens } from '../../auth/interactiveAuth'
 
+/**
+ * Convenient alias around the Spotify Web API SDK so downstream code can remain agnostic
+ * to the underlying library while still benefiting from its typings.
+ */
 export type SpotifyClient = SpotifyWebApi
 
 let cachedClient: SpotifyClient | null = null
 
 /**
- * Create or return a cached Spotify Web API client configured with env credentials.
+ * Create (and memoize) a Spotify client pre-configured with client credentials and any
+ * persisted access/refresh tokens found in the environment.
  */
 export function getSpotifyClient(): SpotifyClient {
     if (cachedClient) {
@@ -32,7 +37,13 @@ export function getSpotifyClient(): SpotifyClient {
 }
 
 /**
- * Ensure a Spotify Web API client carries valid user tokens, refreshing as needed.
+ * Ensure a Spotify Web API client carries a usable access token by leveraging stored
+ * user tokens, refreshing them when available, and ultimately falling back to the
+ * client credentials flow as a last resort.
+ *
+ * @param client Optional client instance to authenticate; defaults to the cached
+ *               singleton returned by {@link getSpotifyClient}.
+ * @returns A Spotify client guaranteed to have a valid access token set.
  */
 export async function authenticateSpotifyClient(client: SpotifyClient = getSpotifyClient()): Promise<SpotifyClient> {
     await ensureSpotifyUserTokens()

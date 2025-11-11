@@ -4,6 +4,9 @@ import SpotifyWebApi from 'spotify-web-api-node'
 
 import { env, getRequiredEnv } from '../config/env'
 
+/**
+ * Minimal set of Spotify scopes required for playback control and profile telemetry.
+ */
 export const DEFAULT_SPOTIFY_SCOPES = [
     'user-read-private',
     'user-read-email',
@@ -11,7 +14,11 @@ export const DEFAULT_SPOTIFY_SCOPES = [
 ]
 
 /**
- * Build the Spotify OAuth authorize URL with sane defaults for scopes and state.
+ * Build the Spotify OAuth authorize URL with sane defaults for scopes, state, and dialog
+ * behavior while still allowing callers to override them.
+ *
+ * @param options Optional overrides for scopes, CSRF state, and `show_dialog` flag.
+ * @returns Authorization URL plus the normalized scopes/state to persist alongside the flow.
  */
 export function createSpotifyAuthorizeUrl(options?: {
     scopes?: string[]

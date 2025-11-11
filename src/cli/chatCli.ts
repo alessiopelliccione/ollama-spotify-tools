@@ -5,6 +5,9 @@ import { parseArgs } from 'node:util'
 import { ensureSpotifyUserTokens } from '../auth/interactiveAuth'
 import { runChatWithTools } from '../core/chatRunner'
 
+/**
+ * CLI flags that influence how requests are issued to Ollama.
+ */
 type CliOptions = {
     model?: string
 }
@@ -16,6 +19,8 @@ type ParsedCliArgs = CliOptions & {
 
 /**
  * Parse positional arguments and flags supported by the CLI.
+ *
+ * @returns Normalized options plus metadata describing whether help was requested.
  */
 function parseCliArguments(): ParsedCliArgs {
     const { values, positionals } = parseArgs({
@@ -53,7 +58,9 @@ If no prompt is provided, an interactive REPL session will start. Use /exit to q
 }
 
 /**
- * Start a REPL loop that forwards every user message to runChatWithTools.
+ * Start a REPL loop that forwards each user utterance to {@link runChatWithTools}.
+ *
+ * @param options CLI options to reuse for every prompt.
  */
 async function runInteractiveLoop(options: CliOptions) {
     const rl = readline.createInterface({ input, output })

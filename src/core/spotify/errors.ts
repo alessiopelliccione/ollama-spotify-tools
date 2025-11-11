@@ -1,9 +1,15 @@
+/**
+ * Slim representation matching the shape of errors thrown by `spotify-web-api-node`.
+ */
 type SpotifyApiError = {
     statusCode?: number
     body?: unknown
     message?: string
 }
 
+/**
+ * Serialized error payload returned to the LLM so it can reason about the failure cause.
+ */
 export type SerializedSpotifyError =
     | {
           source: 'spotify'
@@ -18,6 +24,13 @@ export type SerializedSpotifyError =
           stack?: string
       }
 
+/**
+ * Normalize unknown runtime errors into a consistent machine-readable structure that the LLM
+ * can inspect when Spotify operations fail.
+ *
+ * @param error Any thrown error value from the Spotify SDK or runtime.
+ * @returns Structured data describing the failure source and details.
+ */
 export function serializeSpotifyError(error: unknown): SerializedSpotifyError {
     if (error && typeof error === 'object') {
         const { statusCode, body, message } = error as SpotifyApiError

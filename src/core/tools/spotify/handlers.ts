@@ -2,6 +2,10 @@ import { authenticateSpotifyClient } from '../../clients/spotifyClient'
 import { serializeSpotifyError } from '../../spotify/errors'
 import type { ToolHandler } from '../types'
 
+/**
+ * Runtime implementations for each Spotify tool definition. Handlers return structured
+ * payloads that the LLM can reason about, including serialized errors when operations fail.
+ */
 export const spotifyToolHandlers: Record<string, ToolHandler> = {
     get_spotify_me: async (_args) => {
         const spotify = await authenticateSpotifyClient()
