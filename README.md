@@ -25,6 +25,12 @@ A lightweight TypeScript toolkit that connects local agents (e.g., Ollama) to th
    npm run build
    ```
 
+## Project structure
+- `core/chatRunner.ts` – main loop that coordinates Ollama responses and tool invocations.
+- `core/clients/` – shared Spotify and Ollama clients configured through `core/config/env.ts`.
+- `core/tools/` – tool definitions plus handlers (currently only Spotify, but easy to extend).
+- `apps/cli/` – the REPL/CLI interface that consumes the shared core.
+
 ## CLI
 The CLI (`ollama-spotify-cli`) kicks off Spotify OAuth only once per session and reuses the tokens afterward.
 
@@ -53,5 +59,8 @@ npx ollama-spotify-cli --help
 ```
 
 ## Extending
-`core/index.ts` re-exports `ensureSpotifyUserTokens` and `runChatWithTools`, so any interface can import and reuse the same Spotify-enabled core without depending on the CLI.
+`core/index.ts` re-exports `ensureSpotifyUserTokens` and `runChatWithTools`, so any interface can import and reuse the same Spotify-enabled core without depending on the CLI:
+```ts
+import { ensureSpotifyUserTokens, runChatWithTools } from 'ollama-spotify-tools'
+```
 The shared helper automatically launches the Spotify OAuth flow whenever tokens are missing, so UIs do not need bespoke authorization logic.
