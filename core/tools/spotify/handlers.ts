@@ -1,5 +1,4 @@
 import { authenticateSpotifyClient } from '../../clients/spotifyClient'
-import { serializeSpotifyError } from './errors'
 import type { ToolHandler } from '../types'
 
 /**
@@ -17,7 +16,7 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
             }
         } catch (error) {
             return {
-                error: serializeSpotifyError(error),
+                error: error,
                 fetchedAt: new Date().toISOString(),
             }
         }
@@ -33,7 +32,7 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
         } catch (error) {
             return {
                 status: 'failed',
-                error: serializeSpotifyError(error),
+                error: error,
                 fetchedAt: new Date().toISOString(),
             }
         }
@@ -52,7 +51,7 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
             return {
                 status: 'failed',
                 deviceId,
-                error: serializeSpotifyError(error),
+                error: error,
                 completedAt: new Date().toISOString(),
             }
         }
@@ -73,7 +72,7 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
                 status: 'failed',
                 direction: 'next',
                 deviceId,
-                error: serializeSpotifyError(error),
+                error: error,
                 completedAt: new Date().toISOString(),
             }
         }
@@ -94,7 +93,7 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
                 status: 'failed',
                 direction: 'previous',
                 deviceId,
-                error: serializeSpotifyError(error),
+                error: error,
                 completedAt: new Date().toISOString(),
             }
         }
@@ -113,7 +112,7 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
             return {
                 status: 'failed',
                 deviceId,
-                error: serializeSpotifyError(error),
+                error: error,
                 completedAt: new Date().toISOString(),
             }
         }
