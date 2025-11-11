@@ -31,6 +31,7 @@ export type SerializedSpotifyError =
  * @param error Any thrown error value from the Spotify SDK or runtime.
  * @returns Structured data describing the failure source and details.
  */
+// TODO try to remove
 export function serializeSpotifyError(error: unknown): SerializedSpotifyError {
     if (error && typeof error === 'object') {
         const { statusCode, body, message } = error as SpotifyApiError

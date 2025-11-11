@@ -22,6 +22,22 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
             }
         }
     },
+    get_spotify_current_playback: async (_args) => {
+        const spotify = await authenticateSpotifyClient()
+        try {
+            const { body } = await spotify.getMyCurrentPlayingTrack()
+            return {
+                info: body,
+                fetchedAt: new Date().toISOString(),
+            }
+        } catch (error) {
+            return {
+                status: 'failed',
+                error: serializeSpotifyError(error),
+                fetchedAt: new Date().toISOString(),
+            }
+        }
+    },
     pause_spotify_playback: async (args) => {
         const deviceId = typeof args.deviceId === 'string' ? args.deviceId : undefined
         const spotify = await authenticateSpotifyClient()

@@ -20,6 +20,18 @@ export const spotifyToolDefinitions: Tool[] = [
     {
         type: 'function',
         function: {
+            name: 'get_spotify_current_playback',
+            description: 'Retrieve information about the track currently playing for the user, if any',
+            parameters: {
+                type: 'object',
+                properties: {},
+                required: [],
+            },
+        },
+    },
+    {
+        type: 'function',
+        function: {
             name: 'pause_spotify_playback',
             description: 'Pause the current Spotify playback for the authenticated user',
             parameters: {
