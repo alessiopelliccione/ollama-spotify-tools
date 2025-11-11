@@ -1,14 +1,8 @@
-import { authenticateSpotifyClient } from '../../clients/spotifyClient'
 import type { ToolHandler } from '../types'
+import {withSpotifyClient} from "./helpers";
 
-// TODO: Refactor duplicated code across modules
-/**
- * Runtime implementations for each Spotify tool definition. Handlers return structured
- * payloads that the LLM can reason about, including serialized errors when operations fail.
- */
 export const spotifyToolHandlers: Record<string, ToolHandler> = {
-    get_spotify_me: async (_args) => {
-        const spotify = await authenticateSpotifyClient()
+    get_spotify_me: withSpotifyClient(async (spotify) => {
         try {
             const response = await spotify.getMe()
             return {
@@ -21,9 +15,8 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
                 fetchedAt: new Date().toISOString(),
             }
         }
-    },
-    get_spotify_current_playback: async (_args) => {
-        const spotify = await authenticateSpotifyClient()
+    }),
+    get_spotify_current_playback: withSpotifyClient(async (spotify) => {
         try {
             const { body } = await spotify.getMyCurrentPlayingTrack()
             return {
@@ -37,10 +30,9 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
                 fetchedAt: new Date().toISOString(),
             }
         }
-    },
-    pause_spotify_playback: async (args) => {
+    }),
+    pause_spotify_playback: withSpotifyClient(async (spotify, args) => {
         const deviceId = typeof args.deviceId === 'string' ? args.deviceId : undefined
-        const spotify = await authenticateSpotifyClient()
         try {
             await spotify.pause({ device_id: deviceId })
             return {
@@ -56,10 +48,9 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
                 completedAt: new Date().toISOString(),
             }
         }
-    },
-    skip_spotify_next: async (args) => {
+    }),
+    skip_spotify_next: withSpotifyClient(async (spotify, args) => {
         const deviceId = typeof args.deviceId === 'string' ? args.deviceId : undefined
-        const spotify = await authenticateSpotifyClient()
         try {
             await spotify.skipToNext({ device_id: deviceId })
             return {
@@ -77,10 +68,9 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
                 completedAt: new Date().toISOString(),
             }
         }
-    },
-    skip_spotify_previous: async (args) => {
+    }),
+    skip_spotify_previous: withSpotifyClient(async (spotify, args) => {
         const deviceId = typeof args.deviceId === 'string' ? args.deviceId : undefined
-        const spotify = await authenticateSpotifyClient()
         try {
             await spotify.skipToPrevious({ device_id: deviceId })
             return {
@@ -98,10 +88,9 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
                 completedAt: new Date().toISOString(),
             }
         }
-    },
-    resume_spotify_playback: async (args) => {
+    }),
+    resume_spotify_playback: withSpotifyClient(async (spotify, args) => {
         const deviceId = typeof args.deviceId === 'string' ? args.deviceId : undefined
-        const spotify = await authenticateSpotifyClient()
         try {
             await spotify.play({ device_id: deviceId })
             return {
@@ -117,8 +106,8 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
                 completedAt: new Date().toISOString(),
             }
         }
-    },
-    search_spotify_tracks: async (args) => {
+    }),
+    search_spotify_tracks: withSpotifyClient(async (spotify, args) => {
         const query = typeof args.query === 'string' ? args.query.trim() : ''
         if (!query) {
             return {
@@ -128,23 +117,24 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
             }
         }
 
-        const spotify = await authenticateSpotifyClient()
         try {
             const { body } = await spotify.searchTracks(query)
             return {
                 status: 'ok',
+                query,
                 results: body,
                 fetchedAt: new Date().toISOString(),
             }
         } catch (error) {
             return {
                 status: 'failed',
+                query,
                 error: error,
                 fetchedAt: new Date().toISOString(),
             }
         }
-    },
-    play_spotify_track_by_query: async (args) => {
+    }),
+    play_spotify_track_by_query: withSpotifyClient(async (spotify, args) => {
         const query = typeof args.query === 'string' ? args.query.trim() : ''
         if (!query) {
             return {
@@ -155,10 +145,9 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
         }
 
         const deviceId = typeof args.deviceId === 'string' ? args.deviceId : undefined
-        const spotify = await authenticateSpotifyClient()
 
         try {
-            const { body } = await spotify.searchTracks(query);
+            const { body } = await spotify.searchTracks(query)
 
             const tracks = body.tracks?.items ?? []
             const selectedTrack = tracks[0]
@@ -204,5 +193,5 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
                 completedAt: new Date().toISOString(),
             }
         }
-    },
+    }),
 }
