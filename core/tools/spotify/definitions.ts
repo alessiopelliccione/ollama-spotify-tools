@@ -97,4 +97,44 @@ export const spotifyToolDefinitions: Tool[] = [
             },
         },
     },
+    {
+        type: 'function',
+        function: {
+            name: 'search_spotify_tracks',
+            description:
+                'Search Spotify tracks matching a free-text query or advanced field filters (e.g., artist:Love track:Alright)',
+            parameters: {
+                type: 'object',
+                properties: {
+                    query: {
+                        type: 'string',
+                        description: 'Search expression that follows the Spotify Search API syntax. Required.',
+                    }
+                },
+                required: ['query'],
+            },
+        },
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'play_spotify_track_by_query',
+            description:
+                'Search Spotify for the best-matching track and immediately start playback with that track on the chosen device.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    query: {
+                        type: 'string',
+                        description: 'User utterance describing what to play (song name, artist, etc.). Required.',
+                    },
+                    deviceId: {
+                        type: 'string',
+                        description: 'Optional Spotify device ID to target. Defaults to the actively playing device.',
+                    },
+                },
+                required: ['query'],
+            },
+        },
+    },
 ]
