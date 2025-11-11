@@ -18,14 +18,15 @@
   "license": "MIT",
   "author": "Alessio Pelliccione",
   "type": "commonjs",
-  "main": "dist/index.js",
+  "main": "dist/core/index.js",
+  "types": "dist/core/index.d.ts",
   "bin": {
-    "ollama-spotify-cli": "dist/cli/chatCli.js"
+    "ollama-spotify-cli": "dist/apps/cli/chatCli.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "npx ts-node src/cli/chatCli.ts",
-    "cli": "npx ts-node src/cli/chatCli.ts",
+    "start": "npx ts-node apps/cli/chatCli.ts",
+    "cli": "npx ts-node apps/cli/chatCli.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

@@ -2,8 +2,8 @@ import readline from 'node:readline/promises'
 import { stdin as input, stdout as output, stderr } from 'node:process'
 import { parseArgs } from 'node:util'
 
-import { ensureSpotifyUserTokens } from '../auth/interactiveAuth'
-import { runChatWithTools } from '../core/chatRunner'
+import { ensureSpotifyUserTokens } from '../../core/auth/interactiveAuth'
+import { runChatWithTools } from '../../core/core/chatRunner'
 
 /**
  * CLI flags that influence how requests are issued to Ollama.

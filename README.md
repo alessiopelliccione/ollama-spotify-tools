@@ -53,5 +53,5 @@ npx ollama-spotify-cli --help
 ```
 
 ## Extending
-`src/index.ts` re-exports `ensureSpotifyUserTokens` and `runChatWithTools`, so any interface can import and reuse the same Spotify-enabled core without depending on the CLI.
+`core/index.ts` re-exports `ensureSpotifyUserTokens` and `runChatWithTools`, so any interface can import and reuse the same Spotify-enabled core without depending on the CLI.
 The shared helper automatically launches the Spotify OAuth flow whenever tokens are missing, so UIs do not need bespoke authorization logic.

@@ -1,5 +1,5 @@
 import { authenticateSpotifyClient } from '../../clients/spotifyClient'
-import { serializeSpotifyError } from '../../spotify/errors'
+import { serializeSpotifyError } from './errors'
 import type { ToolHandler } from '../types'
 
 /**
