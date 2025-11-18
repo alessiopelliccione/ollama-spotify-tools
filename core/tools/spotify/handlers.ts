@@ -1,5 +1,5 @@
 import type { ToolHandler } from '../types'
-import {withSpotifyClient} from "./helpers";
+import { withSpotifyClient } from "./helpers";
 
 export const spotifyToolHandlers: Record<string, ToolHandler> = {
     get_spotify_me: withSpotifyClient(async (spotify) => {
@@ -134,7 +134,6 @@ export const spotifyToolHandlers: Record<string, ToolHandler> = {
             }
         }
     }),
-    // TODO: See if it is possible to use just one tool for this (normal play)
     play_spotify_track_by_query: withSpotifyClient(async (spotify, args) => {
         const query = typeof args.query === 'string' ? args.query.trim() : ''
         if (!query) {
