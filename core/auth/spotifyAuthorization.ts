@@ -12,6 +12,8 @@ export const DEFAULT_SPOTIFY_SCOPES = [
     'user-read-email',
     'user-modify-playback-state',
     'user-read-currently-playing',
+    'playlist-modify-public',
+    'playlist-modify-private',
 ]
 
 /**
