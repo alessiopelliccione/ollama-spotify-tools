@@ -28,8 +28,15 @@ A lightweight TypeScript toolkit that connects local agents (e.g., Ollama) to th
 ## Project structure
 - `core/chatRunner.ts` – main loop that coordinates Ollama responses and tool invocations.
 - `core/clients/` – shared Spotify and Ollama clients configured through `core/config/env.ts`.
-- `core/tools/` – tool definitions plus handlers (currently only Spotify, but easy to extend).
+- `core/tools/` – tool definitions plus handlers (includes Spotify and can be extended).
 - `apps/cli/` – the REPL/CLI interface that consumes the shared core.
+- `.github/scripts/` – contains GitHub workflow scripts such as `evaluate-pr.js` for automated PR reviews.
+
+## Features
+- OAuth integration with Spotify for seamless authentication.
+- AI-powered command evaluation and playlist creation using OpenAI API.
+- Extendable tool definitions for interaction with Spotify API.
+- Automated GitHub workflows for CI/CD using TypeScript.
 
 ## CLI
 The CLI (`ollama-spotify-cli`) kicks off Spotify OAuth only once per session and reuses the tokens afterward.
@@ -64,3 +71,10 @@ npx ollama-spotify-cli --help
 import { ensureSpotifyUserTokens, runChatWithTools } from 'ollama-spotify-tools'
 ```
 The shared helper automatically launches the Spotify OAuth flow whenever tokens are missing, so UIs do not need bespoke authorization logic.
+
+## GitHub Workflows
+The repository includes GitHub workflows to automate the CI/CD process:
+- **CI Workflow**: Managed by `ci.yml`, it ensures all builds and tests are run for each commit.
+- **PR Evaluation**: Script `evaluate-pr.js` uses OpenAI to perform AI-driven code reviews on pull requests, focusing on TypeScript best practices, code quality, and architectural insights.
+
+These workflows streamline development and ensure code quality through automated checks and AI-driven insights.
