@@ -37,7 +37,6 @@ A lightweight TypeScript toolkit that connects local agents (e.g., Ollama) to th
 - AI-powered command evaluation and playlist creation using OpenAI API.
 - Extendable tool definitions for interaction with Spotify API.
 - Automated GitHub workflows for CI/CD using TypeScript.
-- Automated README updates through GitHub Actions to ensure documentation stays current with code changes.
 
 ## CLI
 The CLI (`ollama-spotify-cli`) kicks off Spotify OAuth only once per session and reuses the tokens afterward.
@@ -77,6 +76,5 @@ The shared helper automatically launches the Spotify OAuth flow whenever tokens 
 The repository includes GitHub workflows to automate the CI/CD process:
 - **CI Workflow**: Managed by `ci.yml`, it ensures all builds and tests are run for each commit.
 - **PR Evaluation**: Script `evaluate-pr.js` uses OpenAI to perform AI-driven code reviews on pull requests, focusing on TypeScript best practices, code quality, and architectural insights.
-- **README Updates**: Automated updates to the README are handled by a workflow using `update-readme.yml`, which creates a pull request for any changes to keep documentation in sync with the latest code updates.
 
 These workflows streamline development and ensure code quality through automated checks and AI-driven insights.
